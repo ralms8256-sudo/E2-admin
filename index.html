@@ -3,63 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة إدارة الموظفين - الاحترافية</title>
+    <title>نظام إدارة الموظفين المتطور</title>
     <style>
-        :root { --primary: #1a73e8; --danger: #d93025; --success: #1e8e3e; --gray: #5f6368; }
+        :root { --primary: #1a73e8; --danger: #d93025; --success: #1e8e3e; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        
+        .container { max-width: 1400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .header-section { text-align: center; margin-bottom: 30px; }
-        .logo { max-width: 200px; height: auto; margin-bottom: 15px; border-radius: 10px; }
-        
-        .search-area { text-align: center; margin-bottom: 25px; }
-        .search-bar { width: 100%; max-width: 500px; padding: 12px 20px; border: 2px solid #dfe1e5; border-radius: 25px; font-size: 16px; outline: none; transition: 0.3s; }
-        .search-bar:focus { border-color: var(--primary); box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
-
-        .top-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; font-size: 14px; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-add { background-color: var(--success); }
-        .btn-refresh { background-color: var(--primary); }
-        .btn:hover { opacity: 0.85; transform: translateY(-1px); }
-
-        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th, td { padding: 15px; text-align: center; border-bottom: 1px solid #eee; }
-        th { background-color: var(--primary); color: white; font-weight: 600; position: sticky; top: 0; }
-        tr:hover { background-color: #f8f9fa; }
-        
-        .btn-action { padding: 6px 12px; border-radius: 4px; font-size: 12px; margin: 2px; cursor: pointer; border: none; font-weight: bold; }
+        .logo { max-width: 180px; height: auto; margin-bottom: 10px; }
+        .search-bar { width: 100%; max-width: 500px; padding: 12px; border: 2px solid #eee; border-radius: 25px; display: block; margin: 0 auto 20px auto; outline: none; }
+        .top-actions { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; color: white; font-weight: bold; }
+        .btn-add { background: var(--success); }
+        .btn-refresh { background: var(--primary); }
+        .table-container { overflow-x: auto; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-size: 13px; }
+        th { background: var(--primary); color: white; }
+        .btn-action { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; margin: 2px; font-weight: bold; }
         .edit-btn { background: #e8f0fe; color: var(--primary); }
         .delete-btn { background: #fce8e6; color: var(--danger); }
         
-        .loading { text-align: center; padding: 40px; color: var(--gray); font-size: 18px; font-weight: bold; }
-
-        /* نافذة التعديل */
+        /* Modal Style */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; width: 90%; max-width: 450px; border-radius: 12px; position: relative; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-content input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-content { background: white; margin: 2% auto; padding: 25px; width: 90%; max-width: 600px; border-radius: 12px; max-height: 90vh; overflow-y: auto; }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .modal-grid div label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .modal-grid div input, .modal-grid div select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-section">
-        <img src="https://image2url.com/r2/default/images/1771076825777-90574fd6-57a7-417c-94a0-6923baa58b16.jpg" alt="شعار المؤسسة" class="logo">
-        <h2>قاعدة بيانات موظفين ادارة التمريض بالتجمع الصحي</h2>
+        <img src="https://image2url.com/r2/default/images/1771076825777-90574fd6-57a7-417c-94a0-6923baa58b16.jpg" alt="Logo" class="logo">
+        <h2>لوحة تحكم بيانات الموظفين</h2>
     </div>
 
-    <div class="search-area">
-        <input type="text" id="searchInput" onkeyup="searchTable()" class="search-bar" placeholder="🔍 ابحث عن أي بيان بالجدول...">
-    </div>
+    <input type="text" id="searchInput" onkeyup="searchTable()" class="search-bar" placeholder="🔍 بحث في كافة السجلات...">
 
     <div class="top-actions">
-        <button class="btn btn-refresh" onclick="fetchData()">تحديث القائمة 🔄</button>
+        <button class="btn btn-refresh" onclick="fetchData()">تحديث 🔄</button>
         <a href="add-employee.html" class="btn btn-add">➕ إضافة موظف جديد</a>
     </div>
 
-    <div id="status" class="loading">⏳ جاري الاتصال بالسحابة وجلب البيانات...</div>
+    <div id="status" style="text-align:center; padding:20px;">⏳ جاري تحميل البيانات...</div>
     
     <div class="table-container">
         <table id="myTable" style="display:none;">
@@ -74,136 +61,118 @@
         <h3>✏️ تعديل بيانات الموظف</h3>
         <hr>
         <input type="hidden" id="editRowNumber">
-        <label>الاسم الكامل:</label> <input type="text" id="editName">
-        <label>القسم:</label> <input type="text" id="editDept">
-        <label>رقم الهاتف:</label> <input type="text" id="editPhone">
-        <div class="modal-footer">
-            <button class="btn btn-refresh" style="flex:1" onclick="submitEdit()">حفظ التعديلات</button>
+        <div class="modal-grid">
+            <div><label>رقم الموظف (EmployeeID)</label><input type="text" id="editEmployeeID"></div>
+            <div><label>رقم الراتب (SalaryID)</label><input type="text" id="editSalaryID"></div>
+            <div><label>الاسم الكامل</label><input type="text" id="editName"></div>
+            <div><label>المسمى الوظيفي</label><input type="text" id="editJobTitle"></div>
+            <div><label>القسم</label><input type="text" id="editDepartment"></div>
+            <div><label>المؤهل</label><input type="text" id="editQualification"></div>
+            <div><label>الجنسية</label><input type="text" id="editNationality"></div>
+            <div><label>الجنس</label>
+                <select id="editGender">
+                    <option value="ذكر">ذكر</option>
+                    <option value="أنثى">أنثى</option>
+                </select>
+            </div>
+            <div><label>ملاك الوظيفة (Malak)</label><input type="text" id="editMalak"></div>
+            <div><label>البريد الإلكتروني</label><input type="email" id="editEmail"></div>
+        </div>
+        <div style="margin-top:10px;"><label>الهاتف</label><input type="text" id="editPhone" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ddd;"></div>
+        
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-refresh" style="flex:1" onclick="submitEdit()">حفظ التغييرات</button>
             <button class="btn" style="flex:1; background:#888" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
 </div>
 
 <script>
-    // الرابط الخاص بك
     const apiUrl = 'https://script.google.com/macros/s/AKfycby5ZYjpfZrrXZDa2-NjPyPud_JyjsTk3eQCTZ5-7Kldx9Ce5gY58cDKDXrE7SAnFHdIGQ/exec';
 
     async function fetchData() {
-        const status = document.getElementById('status');
-        const table = document.getElementById('myTable');
-        status.style.display = 'block';
-        status.innerText = "⏳ جاري تحديث البيانات...";
-        table.style.display = 'none';
-
         try {
-            // كسر الكاش لضمان جلب بيانات حية
-            const response = await fetch(`${apiUrl}?t=${new Date().getTime()}`);
-            if (!response.ok) throw new Error('Network failure');
-            
-            const data = await response.json();
-            
-            if (data && data.length > 0) {
-                renderTable(data);
-                status.style.display = 'none';
-                table.style.display = 'table';
-            } else {
-                status.innerText = "📂 الجدول فارغ حالياً، قم بإضافة بيانات.";
-            }
-        } catch (error) {
-            console.error(error);
-            status.innerHTML = "❌ فشل الاتصال بالسحابة.<br><small>تأكد من اختيار Anyone في إعدادات النشر بجوجل.</small>";
-        }
+            const res = await fetch(apiUrl + '?t=' + new Date().getTime());
+            const data = await res.json();
+            renderTable(data);
+        } catch (e) { document.getElementById('status').innerText = "❌ خطأ في الاتصال بالسحابة"; }
     }
 
     function renderTable(data) {
         const header = document.getElementById('tableHeader');
         const body = document.getElementById('tableBody');
         header.innerHTML = ""; body.innerHTML = "";
+        if (!data.length) return;
 
-        // الأعمدة المطلوب عرضها (بدون حقل rowNumber)
         const keys = Object.keys(data[0]).filter(k => k !== "rowNumber");
-        
         let hRow = "<tr>";
         keys.forEach(k => hRow += `<th>${k}</th>`);
-        hRow += "<th>إدارة</th></tr>";
+        hRow += "<th>الإجراءات</th></tr>";
         header.innerHTML = hRow;
 
         data.forEach(item => {
             let tr = document.createElement('tr');
-            keys.forEach(k => {
-                let td = document.createElement('td');
-                td.innerText = item[k] || "-";
-                tr.appendChild(td);
-            });
-
+            keys.forEach(k => { let td = document.createElement('td'); td.innerText = item[k] || "-"; tr.appendChild(td); });
+            
             let actionTd = document.createElement('td');
             actionTd.innerHTML = `
-                <button class="btn-action edit-btn" onclick="openEditModal(${item.rowNumber}, '${item.Name}', '${item.Department}', '${item.Phone}')">تعديل</button>
+                <button class="btn-action edit-btn" onclick="openEditModal(${item.rowNumber}, ${JSON.stringify(item).replace(/"/g, '&quot;')})">تعديل</button>
                 <button class="btn-action delete-btn" onclick="deleteEntry(${item.rowNumber})">حذف</button>
             `;
             tr.appendChild(actionTd);
             body.appendChild(tr);
         });
+        document.getElementById('status').style.display = 'none';
+        document.getElementById('myTable').style.display = 'table';
     }
 
-    async function deleteEntry(rowNum) {
-        if (!confirm("⚠️ هل أنت متأكد من حذف هذا السجل نهائياً؟")) return;
-        try {
-            // وضع مؤشر تحميل بسيط
-            document.getElementById('status').innerText = "جاري الحذف...";
-            document.getElementById('status').style.display = 'block';
-
-            await fetch(apiUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: "delete", rowNumber: rowNum })
-            });
-            
-            alert("✅ تم إرسال طلب الحذف بنجاح.");
-            setTimeout(fetchData, 1500); 
-        } catch (e) { alert("❌ حدث خطأ أثناء الحذف."); }
-    }
-
-    function openEditModal(rowNum, name, dept, phone) {
+    function openEditModal(rowNum, item) {
         document.getElementById('editRowNumber').value = rowNum;
-        document.getElementById('editName').value = name;
-        document.getElementById('editDept').value = dept;
-        document.getElementById('editPhone').value = phone;
+        document.getElementById('editEmployeeID').value = item.EmployeeID || '';
+        document.getElementById('editSalaryID').value = item.SalaryID || '';
+        document.getElementById('editName').value = item.Name || '';
+        document.getElementById('editJobTitle').value = item.JobTitle || '';
+        document.getElementById('editDepartment').value = item.Department || '';
+        document.getElementById('editQualification').value = item.Qualification || '';
+        document.getElementById('editNationality').value = item.Nationality || '';
+        document.getElementById('editGender').value = item.Gender || 'ذكر';
+        document.getElementById('editMalak').value = item.Malak || '';
+        document.getElementById('editEmail').value = item.Email || '';
+        document.getElementById('editPhone').value = item.Phone || '';
         document.getElementById('editModal').style.display = 'block';
     }
 
-    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
-
     async function submitEdit() {
-        const rowNum = parseInt(document.getElementById('editRowNumber').value);
-        const updatedData = {
+        const data = {
+            EmployeeID: document.getElementById('editEmployeeID').value,
+            SalaryID: document.getElementById('editSalaryID').value,
             Name: document.getElementById('editName').value,
-            Department: document.getElementById('editDept').value,
+            JobTitle: document.getElementById('editJobTitle').value,
+            Department: document.getElementById('editDepartment').value,
+            Qualification: document.getElementById('editQualification').value,
+            Nationality: document.getElementById('editNationality').value,
+            Gender: document.getElementById('editGender').value,
+            Malak: document.getElementById('editMalak').value,
+            Email: document.getElementById('editEmail').value,
             Phone: document.getElementById('editPhone').value
         };
-
-        try {
-            await fetch(apiUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: "edit", rowNumber: rowNum, data: updatedData })
-            });
-            alert("✅ تم حفظ التعديلات بنجاح.");
-            closeModal();
-            setTimeout(fetchData, 1500);
-        } catch (e) { alert("❌ فشل تحديث البيانات."); }
+        await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "edit", rowNumber: parseInt(document.getElementById('editRowNumber').value), data: data }) });
+        alert("✅ تم التعديل بنجاح!"); closeModal(); setTimeout(fetchData, 1000);
     }
 
+    async function deleteEntry(rowNum) {
+        if (!confirm("هل تريد حذف هذا السجل نهائياً؟")) return;
+        await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", rowNumber: rowNum }) });
+        alert("🗑️ تم الحذف!"); setTimeout(fetchData, 1000);
+    }
+
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
     function searchTable() {
         let val = document.getElementById("searchInput").value.toLowerCase();
         let rows = document.getElementById("tableBody").getElementsByTagName("tr");
-        for (let r of rows) {
-            r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none";
-        }
+        for (let r of rows) r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none";
     }
-
     window.onload = fetchData;
 </script>
 </body>
 </html>
-
