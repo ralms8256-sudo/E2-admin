@@ -2,64 +2,59 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إضافة موظف</title>
+    <title>إضافة موظف جديد</title>
     <style>
-        body { font-family: 'Segoe UI', Arial; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h2 { text-align: center; color: #1a73e8; margin-top: 0; }
-        .field { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #555; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #34a853; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
-        button:disabled { background: #ccc; }
-        .back { display: block; text-align: center; margin-top: 15px; color: #1a73e8; text-decoration: none; font-size: 14px; }
+        body { font-family: 'Segoe UI', Arial; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 600px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #1a73e8; text-align: center; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #34a853; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-
 <div class="card">
-    <h2>➕ موظف جديد</h2>
+    <h2>➕ إضافة موظف جديد</h2>
     <form id="addForm">
-        <div class="field"><label>EmployeeID</label><input type="text" name="EmployeeID" required></div>
-        <div class="field"><label>Name</label><input type="text" name="Name" required></div>
-        <div class="field"><label>Department</label><input type="text" name="Department" required></div>
-        <div class="field"><label>Email</label><input type="email" name="Email" required></div>
-        <div class="field"><label>Phone</label><input type="text" name="Phone" required></div>
+        <div class="grid">
+            <div><label>رقم الموظف</label><input type="text" name="EmployeeID" required></div>
+            <div><label>رقم الراتب</label><input type="text" name="SalaryID" required></div>
+            <div><label>الاسم الكامل</label><input type="text" name="Name" required></div>
+            <div><label>المسمى الوظيفي</label><input type="text" name="JobTitle" required></div>
+            <div><label>القسم</label><input type="text" name="Department" required></div>
+            <div><label>المؤهل</label><input type="text" name="Qualification" required></div>
+            <div><label>الجنسية</label><input type="text" name="Nationality" required></div>
+            <div><label>الجنس</label>
+                <select name="Gender">
+                    <option value="ذكر">ذكر</option>
+                    <option value="أنثى">أنثى</option>
+                </select>
+            </div>
+            <div><label>ملاك الوظيفة</label><input type="text" name="Malak" required></div>
+            <div><label>البريد الإلكتروني</label><input type="email" name="Email" required></div>
+        </div>
+        <div style="margin-top:10px;"><label>رقم الهاتف</label><input type="text" name="Phone" required></div>
         <button type="submit" id="btn">حفظ البيانات</button>
     </form>
-    <a href="index.html" class="back">🔙 العودة للجدول</a>
+    <a href="index.html" style="display:block; text-align:center; margin-top:15px; color:#1a73e8; text-decoration:none;">🔙 العودة للجدول الرئيسي</a>
 </div>
 
 <script>
     const apiUrl = 'https://script.google.com/macros/s/AKfycby5ZYjpfZrrXZDa2-NjPyPud_JyjsTk3eQCTZ5-7Kldx9Ce5gY58cDKDXrE7SAnFHdIGQ/exec';
-
     document.getElementById('addForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const b = document.getElementById('btn');
-        b.innerText = "جاري الحفظ...";
-        b.disabled = true;
-
-        const data = Object.fromEntries(new FormData(e.target).entries());
-
+        b.innerText = "جاري الحفظ..."; b.disabled = true;
+        const formData = Object.fromEntries(new FormData(e.target).entries());
+        
         try {
-            await fetch(apiUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(data)
-            });
-            alert("✅ تم الإرسال بنجاح!");
+            await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "add", data: formData }) });
+            alert("✅ تم إضافة الموظف بنجاح!");
             e.target.reset();
-        } catch (error) {
-            alert("❌ خطأ في الاتصال.");
-        } finally {
-            b.innerText = "حفظ البيانات";
-            b.disabled = false;
-        }
+        } catch (e) { alert("❌ حدث خطأ أثناء الحفظ!"); }
+        b.innerText = "حفظ البيانات"; b.disabled = false;
     });
 </script>
 </body>
 </html>
-
-
-
