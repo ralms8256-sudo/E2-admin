@@ -10,9 +10,7 @@
         .container { max-width: 1450px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .header-section { text-align: center; margin-bottom: 30px; }
         .logo { max-width: 180px; height: auto; margin-bottom: 10px; }
-        .search-area { text-align: center; margin-bottom: 25px; }
-        .search-bar { width: 100%; max-width: 500px; padding: 12px 20px; border: 2px solid #dfe1e5; border-radius: 25px; outline: none; transition: 0.3s; font-size: 16px; }
-        .search-bar:focus { border-color: var(--primary); }
+        .search-bar { width: 100%; max-width: 500px; padding: 12px 20px; border: 2px solid #dfe1e5; border-radius: 25px; display: block; margin: 0 auto 20px auto; outline: none; }
         .top-actions { display: flex; justify-content: space-between; margin-bottom: 20px; }
         .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; color: white; font-weight: bold; font-size: 14px; }
         .btn-add { background: var(--success); }
@@ -22,13 +20,13 @@
         th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-size: 13px; }
         th { background: var(--primary); color: white; position: sticky; top: 0; }
         tr:hover { background-color: #f1f3f4; }
-        .btn-action { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; margin: 2px; font-weight: bold; }
+        .btn-action { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; margin: 2px; }
         .edit-btn { background: #e8f0fe; color: var(--primary); }
         .delete-btn { background: #fce8e6; color: var(--danger); }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
         .modal-content { background: white; margin: 2% auto; padding: 25px; width: 90%; max-width: 650px; border-radius: 12px; max-height: 90vh; overflow-y: auto; }
         .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .modal-grid div label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .modal-grid div label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
         .modal-grid div input, .modal-grid div select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
         .full-width { grid-column: span 2; }
     </style>
@@ -41,9 +39,7 @@
         <h2>قاعدة بيانات موظفي ادارة التمريض بالتجمع الصحي</h2>
     </div>
 
-    <div class="search-area">
-        <input type="text" id="searchInput" onkeyup="searchTable()" class="search-bar" placeholder="🔍 ابحث عن موظف بالاسم أو السجل المدني أو الرقم الوظيفي...">
-    </div>
+    <input type="text" id="searchInput" onkeyup="searchTable()" class="search-bar" placeholder="🔍 بحث بالاسم أو السجل المدني...">
 
     <div class="top-actions">
         <button class="btn btn-refresh" onclick="fetchData()">تحديث القائمة 🔄</button>
@@ -101,7 +97,7 @@
             <div class="full-width"><label>رقم الهاتف</label><input type="text" id="editPhone"></div>
         </div>
         <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="btn btn-refresh" style="flex:1" onclick="submitEdit()">حفظ التعديلات</button>
+            <button class="btn btn-refresh" style="flex:1" id="saveBtn" onclick="submitEdit()">حفظ التعديلات</button>
             <button class="btn" style="flex:1; background:#888" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
@@ -115,17 +111,13 @@
             const res = await fetch(apiUrl + '?t=' + new Date().getTime());
             const data = await res.json();
             renderTable(data);
-        } catch (e) { document.getElementById('status').innerText = "❌ فشل الاتصال بالسحابة"; }
+        } catch (e) { document.getElementById('status').innerText = "❌ فشل الاتصال"; }
     }
 
     function renderTable(data) {
         const body = document.getElementById('tableBody');
         body.innerHTML = "";
-        if (!data || data.length === 0) {
-            document.getElementById('status').innerText = "📂 لا توجد بيانات.";
-            return;
-        }
-
+        if (!data || data.length === 0) return;
         data.forEach(item => {
             let tr = document.createElement('tr');
             tr.innerHTML = `
@@ -170,6 +162,8 @@
     }
 
     async function submitEdit() {
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.disabled = true; saveBtn.innerText = "جاري التحقق...";
         const rowNum = parseInt(document.getElementById('editRowNumber').value);
         const data = {
             EmployeeID: document.getElementById('editEmployeeID').value,
@@ -185,17 +179,23 @@
             Email: document.getElementById('editEmail').value,
             Phone: document.getElementById('editPhone').value
         };
-        await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "edit", rowNumber: rowNum, data: data }) });
-        alert("✅ تم التعديل!");
-        closeModal();
-        setTimeout(fetchData, 1000);
+
+        try {
+            const response = await fetch(apiUrl, { method: 'POST', body: JSON.stringify({ action: "edit", rowNumber: rowNum, data: data }) });
+            const result = await response.text();
+            if (result.includes("Error")) {
+                alert("⚠️ خطأ: رقم السجل المدني موجود لموظف آخر!");
+            } else {
+                alert("✅ تم التعديل!"); closeModal(); fetchData();
+            }
+        } catch (e) { alert("❌ خطأ اتصال"); }
+        saveBtn.disabled = false; saveBtn.innerText = "حفظ التعديلات";
     }
 
     async function deleteEntry(rowNum) {
         if (!confirm("حذف؟")) return;
-        await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", rowNumber: rowNum }) });
-        alert("🗑️ تم الحذف.");
-        setTimeout(fetchData, 1000);
+        await fetch(apiUrl, { method: 'POST', body: JSON.stringify({ action: "delete", rowNumber: rowNum }) });
+        fetchData();
     }
 
     function closeModal() { document.getElementById('editModal').style.display = 'none'; }
