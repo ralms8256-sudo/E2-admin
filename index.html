@@ -3,51 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الموظفين - العرض</title>
+    <title>لوحة إدارة الموظفين</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 20px; background-color: #f0f2f5; color: #333; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: #1a73e8; margin-bottom: 20px; }
+        :root { --primary: #1a73e8; --danger: #d93025; --success: #1e8e3e; --gray: #5f6368; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         
-        .search-area { margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        #searchInput { width: 100%; max-width: 500px; padding: 12px 20px; border: 2px solid #dfe1e5; border-radius: 25px; font-size: 16px; outline: none; transition: 0.3s; }
-        #searchInput:focus { border-color: #1a73e8; box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
+        /* القسم العلوي والشعار */
+        .header-section { text-align: center; margin-bottom: 30px; }
+        .logo { max-width: 200px; height: auto; margin-bottom: 15px; }
+        
+        .search-area { text-align: center; margin-bottom: 25px; }
+        .search-bar { width: 100%; max-width: 500px; padding: 12px 20px; border: 2px solid #dfe1e5; border-radius: 25px; font-size: 16px; outline: none; transition: 0.3s; }
+        .search-bar:focus { border-color: var(--primary); box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
 
-        .actions { display: flex; justify-content: space-between; width: 100%; max-width: 600px; }
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; }
-        .btn-add { background-color: #34a853; }
-        .btn-refresh { background-color: #1a73e8; }
+        .top-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; color: white; font-weight: bold; transition: 0.3s; font-size: 14px; }
+        .btn-add { background-color: var(--success); }
+        .btn-refresh { background-color: var(--primary); }
         .btn:hover { opacity: 0.85; transform: translateY(-1px); }
 
-        .table-container { overflow-x: auto; margin-top: 20px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; background: white; }
+        /* الجدول */
+        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th, td { padding: 15px; text-align: center; border-bottom: 1px solid #eee; }
-        th { background-color: #1a73e8; color: white; font-weight: 600; }
+        th { background-color: var(--primary); color: white; font-weight: 600; }
         tr:hover { background-color: #f8f9fa; }
         
-        .loading { text-align: center; padding: 40px; color: #5f6368; font-size: 18px; }
+        .btn-action { padding: 6px 12px; border-radius: 4px; font-size: 12px; margin: 2px; cursor: pointer; border: none; font-weight: bold; }
+        .edit-btn { background: #e8f0fe; color: var(--primary); }
+        .delete-btn { background: #fce8e6; color: var(--danger); }
+        
+        .loading { text-align: center; padding: 40px; color: var(--gray); font-size: 18px; }
+
+        /* نافذة التعديل المنبثقة */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; width: 90%; max-width: 400px; border-radius: 12px; position: relative; }
+        .modal-content h3 { margin-top: 0; color: var(--primary); }
+        .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .modal-content label { font-size: 13px; color: #666; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📊 لوحة بيانات الموظفين</h2>
-    
-    <div class="search-area">
-        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="🔍 ابحث بالاسم أو رقم الموظف...">
-        <div class="actions">
-            <button class="btn btn-refresh" onclick="fetchData()">تحديث البيانات 🔄</button>
-            <a href="add-employee.html" class="btn btn-add">➕ إضافة موظف</a>
-        </div>
+    <div class="header-section">
+        <img src="https://image2url.com/r2/default/images/1771076825777-90574fd6-57a7-417c-94a0-6923baa58b16.jpg" alt="شعار المؤسسة" class="logo">
+        <h2>نظام إدارة الموظفين</h2>
     </div>
 
-    <div id="status" class="loading">جاري الاتصال بقاعدة البيانات...</div>
+    <div class="search-area">
+        <input type="text" id="searchInput" onkeyup="searchTable()" class="search-bar" placeholder="🔍 ابحث بالاسم، الرقم، أو القسم...">
+    </div>
+
+    <div class="top-actions">
+        <button class="btn btn-refresh" onclick="fetchData()">تحديث القائمة 🔄</button>
+        <a href="add-employee.html" class="btn btn-add">➕ إضافة موظف جديد</a>
+    </div>
+
+    <div id="status" class="loading">جاري جلب البيانات...</div>
     
     <div class="table-container">
         <table id="myTable" style="display:none;">
             <thead id="tableHeader"></thead>
             <tbody id="tableBody"></tbody>
         </table>
+    </div>
+</div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3>✏️ تعديل البيانات</h3>
+        <input type="hidden" id="editRowNumber">
+        <label>الاسم الكامل:</label> <input type="text" id="editName">
+        <label>القسم:</label> <input type="text" id="editDept">
+        <label>رقم الهاتف:</label> <input type="text" id="editPhone">
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn btn-refresh" style="flex:1" onclick="submitEdit()">حفظ</button>
+            <button class="btn" style="flex:1; background:#999" onclick="closeModal()">إلغاء</button>
+        </div>
     </div>
 </div>
 
@@ -58,25 +92,15 @@
         const status = document.getElementById('status');
         const table = document.getElementById('myTable');
         status.style.display = 'block';
-        status.innerText = "جاري جلب أحدث البيانات...";
         table.style.display = 'none';
 
         try {
-            // استخدام كسر الكاش لضمان جلب بيانات جديدة
-            const response = await fetch(apiUrl + '?nocache=' + new Date().getTime());
-            const data = await response.json();
-
-            if (!data || data.length === 0) {
-                status.innerText = "الجدول فارغ حالياً، قم بإضافة موظفين.";
-                return;
-            }
-
+            const res = await fetch(apiUrl + '?t=' + new Date().getTime());
+            const data = await res.json();
             renderTable(data);
             status.style.display = 'none';
-            table.style.display = 'table';
-        } catch (error) {
-            status.innerText = "❌ فشل الاتصال. تأكد من إعدادات النشر في Google Script.";
-            console.error("Error:", error);
+        } catch (e) {
+            status.innerText = "❌ خطأ في الاتصال بالسحابة";
         }
     }
 
@@ -85,35 +109,83 @@
         const body = document.getElementById('tableBody');
         header.innerHTML = ""; body.innerHTML = "";
 
-        // إنشاء العناوين تلقائياً من أول كائن
-        const keys = Object.keys(data[0]);
+        if (!data || data.length === 0) return;
+
+        const keys = Object.keys(data[0]).filter(k => k !== "rowNumber");
         let hRow = "<tr>";
         keys.forEach(k => hRow += `<th>${k}</th>`);
-        header.innerHTML = hRow + "</tr>";
+        hRow += "<th>الخيارات</th></tr>";
+        header.innerHTML = hRow;
 
-        // تعبئة الصفوف
         data.forEach(item => {
-            let row = document.createElement('tr');
+            let tr = document.createElement('tr');
             keys.forEach(k => {
-                let cell = document.createElement('td');
-                cell.innerText = item[k] || "-";
-                row.appendChild(cell);
+                let td = document.createElement('td');
+                td.innerText = item[k] || "-";
+                tr.appendChild(td);
             });
-            body.appendChild(row);
+
+            let actionTd = document.createElement('td');
+            actionTd.innerHTML = `
+                <button class="btn-action edit-btn" onclick="openEditModal(${item.rowNumber}, '${item.Name}', '${item.Department}', '${item.Phone}')">تعديل</button>
+                <button class="btn-action delete-btn" onclick="deleteEntry(${item.rowNumber})">حذف</button>
+            `;
+            tr.appendChild(actionTd);
+            body.appendChild(tr);
         });
+        table.style.display = 'table';
+    }
+
+    async function deleteEntry(rowNum) {
+        if (!confirm("هل أنت متأكد من حذف هذا السجل؟")) return;
+        try {
+            await fetch(apiUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: "delete", rowNumber: rowNum })
+            });
+            alert("تم الحذف بنجاح");
+            setTimeout(fetchData, 1000);
+        } catch (e) { alert("خطأ في العملية"); }
+    }
+
+    function openEditModal(rowNum, name, dept, phone) {
+        document.getElementById('editRowNumber').value = rowNum;
+        document.getElementById('editName').value = name;
+        document.getElementById('editDept').value = dept;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
+    async function submitEdit() {
+        const rowNum = parseInt(document.getElementById('editRowNumber').value);
+        const data = {
+            Name: document.getElementById('editName').value,
+            Department: document.getElementById('editDept').value,
+            Phone: document.getElementById('editPhone').value
+        };
+
+        try {
+            await fetch(apiUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: "edit", rowNumber: rowNum, data: data })
+            });
+            alert("تم التعديل بنجاح");
+            closeModal();
+            setTimeout(fetchData, 1000);
+        } catch (e) { alert("خطأ في التعديل"); }
     }
 
     function searchTable() {
         let val = document.getElementById("searchInput").value.toLowerCase();
         let rows = document.getElementById("tableBody").getElementsByTagName("tr");
-        for (let r of rows) {
-            r.style.display = r.textContent.toLowerCase().includes(val) ? "": "none";
-        }
+        for (let r of rows) r.style.display = r.textContent.toLowerCase().includes(val) ? "" : "none";
     }
 
     window.onload = fetchData;
 </script>
 </body>
 </html>
-
-
