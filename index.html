@@ -3,32 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الموظفين المتطور</title>
+    <title>نظام إدارة الموظفين</title>
     <style>
         :root { --primary: #1a73e8; --danger: #d93025; --success: #1e8e3e; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
         .container { max-width: 1400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .header-section { text-align: center; margin-bottom: 30px; }
         .logo { max-width: 180px; height: auto; margin-bottom: 10px; }
-        .search-bar { width: 100%; max-width: 500px; padding: 12px; border: 2px solid #eee; border-radius: 25px; display: block; margin: 0 auto 20px auto; outline: none; }
+        
+        /* شريط البحث */
+        .search-area { text-align: center; margin-bottom: 25px; }
+        .search-bar { width: 100%; max-width: 500px; padding: 12px 20px; border: 2px solid #dfe1e5; border-radius: 25px; outline: none; transition: 0.3s; font-size: 16px; }
+        .search-bar:focus { border-color: var(--primary); box-shadow: 0 1px 6px rgba(32,33,36,0.28); }
+
         .top-actions { display: flex; justify-content: space-between; margin-bottom: 20px; }
         .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; color: white; font-weight: bold; }
         .btn-add { background: var(--success); }
         .btn-refresh { background: var(--primary); }
-        .table-container { overflow-x: auto; border-radius: 8px; }
+
+        /* الجدول */
+        .table-container { overflow-x: auto; border-radius: 8px; border: 1px solid #eee; }
         table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-size: 13px; }
-        th { background: var(--primary); color: white; }
-        .btn-action { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; margin: 2px; font-weight: bold; }
+        th, td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; font-size: 14px; }
+        th { background: var(--primary); color: white; position: sticky; top: 0; }
+        tr:hover { background-color: #f1f3f4; }
+        
+        .btn-action { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; margin: 2px; font-weight: bold; }
         .edit-btn { background: #e8f0fe; color: var(--primary); }
         .delete-btn { background: #fce8e6; color: var(--danger); }
-        
-        /* Modal Style */
+
+        /* نافذة التعديل المنبثقة */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-        .modal-content { background: white; margin: 2% auto; padding: 25px; width: 90%; max-width: 600px; border-radius: 12px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; margin: 2% auto; padding: 25px; width: 90%; max-width: 650px; border-radius: 12px; max-height: 90vh; overflow-y: auto; position: relative; }
         .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .modal-grid div label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .modal-grid div label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
         .modal-grid div input, .modal-grid div select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .full-width { grid-column: span 2; }
     </style>
 </head>
 <body>
@@ -36,21 +46,38 @@
 <div class="container">
     <div class="header-section">
         <img src="https://image2url.com/r2/default/images/1771076825777-90574fd6-57a7-417c-94a0-6923baa58b16.jpg" alt="Logo" class="logo">
-        <h2>لوحة تحكم بيانات الموظفين</h2>
+        <h2>قاعدة بيانات ادارة التمريض بالتجمع الصحي</h2>
     </div>
 
-    <input type="text" id="searchInput" onkeyup="searchTable()" class="search-bar" placeholder="🔍 بحث في كافة السجلات...">
+    <div class="search-area">
+        <input type="text" id="searchInput" onkeyup="searchTable()" class="search-bar" placeholder="🔍 ابحث عن موظف بالاسم أو الرقم أو القسم...">
+    </div>
 
     <div class="top-actions">
-        <button class="btn btn-refresh" onclick="fetchData()">تحديث 🔄</button>
+        <button class="btn btn-refresh" onclick="fetchData()">تحديث القائمة 🔄</button>
         <a href="add-employee.html" class="btn btn-add">➕ إضافة موظف جديد</a>
     </div>
 
-    <div id="status" style="text-align:center; padding:20px;">⏳ جاري تحميل البيانات...</div>
+    <div id="status" style="text-align:center; padding:20px; color:#666;">⏳ جاري جلب البيانات من السحابة...</div>
     
     <div class="table-container">
         <table id="myTable" style="display:none;">
-            <thead id="tableHeader"></thead>
+            <thead>
+                <tr>
+                    <th>رقم الموظف</th>
+                    <th>رقم الراتب</th>
+                    <th>الاسم الكامل</th>
+                    <th>المسمى الوظيفي</th>
+                    <th>القسم</th>
+                    <th>المؤهل</th>
+                    <th>الجنسية</th>
+                    <th>الجنس</th>
+                    <th>الملاك</th>
+                    <th>الإيميل</th>
+                    <th>الهاتف</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
@@ -62,9 +89,9 @@
         <hr>
         <input type="hidden" id="editRowNumber">
         <div class="modal-grid">
-            <div><label>رقم الموظف (رقم الموظف EmployeeID)</label><input type="text" id="editEmployeeID"></div>
-            <div><label>رقم الراتب (SalaryID)</label><input type="text" id="editSalaryID"></div>
-            <div><label>الاسم الكامل</label><input type="text" id="editName"></div>
+            <div><label>رقم الموظف</label><input type="text" id="editEmployeeID"></div>
+            <div><label>رقم الراتب</label><input type="text" id="editSalaryID"></div>
+            <div class="full-width"><label>الاسم الكامل</label><input type="text" id="editName"></div>
             <div><label>المسمى الوظيفي</label><input type="text" id="editJobTitle"></div>
             <div><label>القسم</label><input type="text" id="editDepartment"></div>
             <div><label>المؤهل</label><input type="text" id="editQualification"></div>
@@ -75,13 +102,13 @@
                     <option value="أنثى">أنثى</option>
                 </select>
             </div>
-            <div><label>ملاك الوظيفة (Malak)</label><input type="text" id="editMalak"></div>
-            <div><label>البريد الإلكتروني</label><input type="email" id="editEmail"></div>
+            <div><label>ملاك الوظيفة</label><input type="text" id="editMalak"></div>
+            <div class="full-width"><label>البريد الإلكتروني</label><input type="email" id="editEmail"></div>
+            <div class="full-width"><label>رقم الهاتف</label><input type="text" id="editPhone"></div>
         </div>
-        <div style="margin-top:10px;"><label>الهاتف</label><input type="text" id="editPhone" style="width:100%; padding:10px; border-radius:6px; border:1px solid #ddd;"></div>
         
         <div style="display:flex; gap:10px; margin-top:20px;">
-            <button class="btn btn-refresh" style="flex:1" onclick="submitEdit()">حفظ التغييرات</button>
+            <button class="btn btn-refresh" style="flex:1" onclick="submitEdit()">حفظ التعديلات</button>
             <button class="btn" style="flex:1; background:#888" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
@@ -95,31 +122,36 @@
             const res = await fetch(apiUrl + '?t=' + new Date().getTime());
             const data = await res.json();
             renderTable(data);
-        } catch (e) { document.getElementById('status').innerText = "❌ خطأ في الاتصال بالسحابة"; }
+        } catch (e) { document.getElementById('status').innerText = "❌ فشل الاتصال بالسحابة"; }
     }
 
     function renderTable(data) {
-        const header = document.getElementById('tableHeader');
         const body = document.getElementById('tableBody');
-        header.innerHTML = ""; body.innerHTML = "";
-        if (!data.length) return;
-
-        const keys = Object.keys(data[0]).filter(k => k !== "rowNumber");
-        let hRow = "<tr>";
-        keys.forEach(k => hRow += `<th>${k}</th>`);
-        hRow += "<th>الإجراءات</th></tr>";
-        header.innerHTML = hRow;
+        body.innerHTML = "";
+        if (!data || data.length === 0) {
+            document.getElementById('status').innerText = "📂 لا توجد بيانات حالياً.";
+            return;
+        }
 
         data.forEach(item => {
             let tr = document.createElement('tr');
-            keys.forEach(k => { let td = document.createElement('td'); td.innerText = item[k] || "-"; tr.appendChild(td); });
-            
-            let actionTd = document.createElement('td');
-            actionTd.innerHTML = `
-                <button class="btn-action edit-btn" onclick="openEditModal(${item.rowNumber}, ${JSON.stringify(item).replace(/"/g, '&quot;')})">تعديل</button>
-                <button class="btn-action delete-btn" onclick="deleteEntry(${item.rowNumber})">حذف</button>
+            tr.innerHTML = `
+                <td>${item.EmployeeID || '-'}</td>
+                <td>${item.SalaryID || '-'}</td>
+                <td>${item.Name || '-'}</td>
+                <td>${item.JobTitle || '-'}</td>
+                <td>${item.Department || '-'}</td>
+                <td>${item.Qualification || '-'}</td>
+                <td>${item.Nationality || '-'}</td>
+                <td>${item.Gender || '-'}</td>
+                <td>${item.Malak || '-'}</td>
+                <td>${item.Email || '-'}</td>
+                <td>${item.Phone || '-'}</td>
+                <td>
+                    <button class="btn-action edit-btn" onclick="openEditModal(${item.rowNumber}, ${JSON.stringify(item).replace(/"/g, '&quot;')})">تعديل</button>
+                    <button class="btn-action delete-btn" onclick="deleteEntry(${item.rowNumber})">حذف</button>
+                </td>
             `;
-            tr.appendChild(actionTd);
             body.appendChild(tr);
         });
         document.getElementById('status').style.display = 'none';
@@ -143,6 +175,7 @@
     }
 
     async function submitEdit() {
+        const rowNum = parseInt(document.getElementById('editRowNumber').value);
         const data = {
             EmployeeID: document.getElementById('editEmployeeID').value,
             SalaryID: document.getElementById('editSalaryID').value,
@@ -156,24 +189,31 @@
             Email: document.getElementById('editEmail').value,
             Phone: document.getElementById('editPhone').value
         };
-        await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "edit", rowNumber: parseInt(document.getElementById('editRowNumber').value), data: data }) });
-        alert("✅ تم التعديل بنجاح!"); closeModal(); setTimeout(fetchData, 1000);
+        
+        await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "edit", rowNumber: rowNum, data: data }) });
+        alert("✅ تم تحديث البيانات بنجاح!");
+        closeModal();
+        setTimeout(fetchData, 1000);
     }
 
     async function deleteEntry(rowNum) {
-        if (!confirm("هل تريد حذف هذا السجل نهائياً؟")) return;
+        if (!confirm("⚠️ هل أنت متأكد من حذف هذا السجل نهائياً؟")) return;
         await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "delete", rowNumber: rowNum }) });
-        alert("🗑️ تم الحذف!"); setTimeout(fetchData, 1000);
+        alert("🗑️ تم حذف السجل.");
+        setTimeout(fetchData, 1000);
     }
 
     function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+
     function searchTable() {
         let val = document.getElementById("searchInput").value.toLowerCase();
         let rows = document.getElementById("tableBody").getElementsByTagName("tr");
-        for (let r of rows) r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none";
+        for (let r of rows) {
+            r.style.display = r.innerText.toLowerCase().includes(val) ? "" : "none";
+        }
     }
+
     window.onload = fetchData;
 </script>
 </body>
 </html>
-
