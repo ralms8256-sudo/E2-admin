@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الموظفين - الاستعلام</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 20px; background-color: #f4f7f6; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
+        
+        .search-box { margin-bottom: 20px; text-align: center; }
+        #searchInput { width: 100%; max-width: 600px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: border-color 0.3s; }
+        #searchInput:focus { border-color: #3498db; }
+
+        .actions { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; color: white; font-weight: bold; font-size: 14px; transition: transform 0.2s, opacity 0.8s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-add { background-color: #8e44ad; }
+        .btn-refresh { background-color: #3498db; }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { border: 1px solid #eee; padding: 15px; text-align: center; }
+        th { background-color: #4CAF50; color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        
+        .loading { text-align: center; padding: 30px; font-weight: bold; color: #e67e22; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔍 نظام الاستعلام عن الموظفين</h2>
+    
+    <div class="search-box">
+        <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="ادخل رقم الموظف أو الاسم للبحث...">
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-refresh" onclick="fetchData()">تحديث البيانات 🔄</button>
+        <a href="add-employee.html" class="btn btn-add">➕ إضافة موظف جديد</a>
+    </div>
+
+    <div id="status" class="loading">جاري جلب البيانات من السحابة...</div>
+    
+    <div class="table-container">
+        <table id="myTable" style="display:none;">
+            <thead id="tableHeader"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // ضع رابط الـ Script الخاص بك هنا
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbDv7kIcIb1CJcmJZOtMHarBnfDzMEJcdKOePH-Xu2d9cY0FDXOMf0onJdyGUxk1OhvEg/exec';
+    let allData = [];
+
+    async function fetchData() {
+        const statusDiv = document.getElementById('status');
+        statusDiv.style.display = 'block';
+        statusDiv.innerText = "جاري جلب البيانات...";
+        document.getElementById('myTable').style.display = 'none';
+
+        try {
+            const response = await fetch(apiUrl + '?t=' + new Date().getTime());
+            allData = await response.json();
+            
+            if (allData.length === 0) {
+                statusDiv.innerText = "لا توجد بيانات مسجلة حالياً.";
+            } else {
+                displayData(allData);
+                statusDiv.style.display = 'none';
+            }
+        } catch (error) {
+            statusDiv.innerText = "❌ فشل الاتصال بقاعدة البيانات!";
+            statusDiv.style.color = "red";
+        }
+    }
+
+    function displayData(data) {
+        const header = document.getElementById('tableHeader');
+        const body = document.getElementById('tableBody');
+        header.innerHTML = ""; body.innerHTML = "";
+
+        const keys = Object.keys(data[0]);
+        let headerRow = "<tr>";
+        keys.forEach(key => headerRow += `<th>${key}</th>`);
+        header.innerHTML = headerRow + "</tr>";
+
+        data.forEach(row => {
+            let tr = document.createElement('tr');
+            keys.forEach(key => {
+                let td = document.createElement('td');
+                td.innerText = row[key] || "-";
+                tr.appendChild(td);
+            });
+            body.appendChild(tr);
+        });
+
+        document.getElementById('myTable').style.display = 'table';
+    }
+
+    function searchTable() {
+        let input = document.getElementById("searchInput").value.toLowerCase();
+        let rows = document.getElementById("tableBody").getElementsByTagName("tr");
+
+        for (let row of rows) {
+            let text = row.textContent.toLowerCase();
+            row.style.display = text.includes(input) ? "" : "none";
+        }
+    }
+
+    fetchData();
+</script>
+</body>
+</html>
