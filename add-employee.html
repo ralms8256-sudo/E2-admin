@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة موظف جديد</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background-color: #f4f7f6; color: #333; }
+        .form-container { max-width: 500px; margin: 40px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 25px; border-bottom: 2px solid #27ae60; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; text-align: right; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        input:focus { border-color: #27ae60; outline: none; }
+        button { width: 100%; padding: 14px; background-color: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .back-link { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #3498db; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>➕ إضافة موظف جديد</h2>
+    <form id="employeeForm">
+        <div class="form-group">
+            <label>رقم الموظف (EmployeeID):</label>
+            <input type="text" name="EmployeeID" required>
+        </div>
+        <div class="form-group">
+            <label>الاسم الكامل (Name):</label>
+            <input type="text" name="Name" required>
+        </div>
+        <div class="form-group">
+            <label>القسم (Department):</label>
+            <input type="text" name="Department" required>
+        </div>
+        <div class="form-group">
+            <label>البريد الإلكتروني (Email):</label>
+            <input type="email" name="Email" required style="direction: ltr; text-align: right;">
+        </div>
+        <div class="form-group">
+            <label>رقم الهاتف (Phone):</label>
+            <input type="tel" name="Phone" required>
+        </div>
+        <button type="submit" id="submitBtn">حفظ البيانات وترحيلها ☁️</button>
+    </form>
+    <a href="index.html" class="back-link">🔙 العودة لصفحة الاستعلام</a>
+</div>
+
+<script>
+    const apiUrl = 'https://script.google.com/macros/s/AKfycbDv7kIcIb1CJcmJZOtMHarBnfDzMEJcdKOePH-Xu2d9cY0FDXOMf0onJdyGUxk1OhvEg/exec';
+
+    document.getElementById('employeeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = "جاري الترحيل الآن...";
+        btn.disabled = true;
+
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            await fetch(apiUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            alert("✅ تمت الإضافة بنجاح! سيتم تحديث الملف خلال ثوانٍ.");
+            e.target.reset();
+        } catch (error) {
+            alert("❌ خطأ في الإرسال.");
+        } finally {
+            btn.innerText = "حفظ البيانات وترحيلها ☁️";
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
